@@ -6,4 +6,26 @@
     android:layout_height="match_parent"
     tools:context="sjohnsoncf.whatzapp.CreateConvoActivity">
 
+    <EditText
+        android:id="@+id/create_convo_title"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Enter title here.."
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_create_convo_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create"
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="51dp" />
+
 </android.support.constraint.ConstraintLayout>

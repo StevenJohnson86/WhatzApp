@@ -5,16 +5,34 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class HomeActivity extends AppCompatActivity {
+    private static final String TAG = "HomeActivity";
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase mFbDb;
+    private DatabaseReference mDbRef;
+
+    @BindView(R.id.listView_convos)
+    ListView mConvosListView;
+    public ArrayList<String> mConvos;
+    private TitleAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +57,41 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         };
+        mConvos = new ArrayList<>();
+        mFbDb = FirebaseDatabase.getInstance();
+        mDbRef = mFbDb.getReference("Convos");
+        mDbRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.d(TAG, "onChildAdded: snapshot :" + dataSnapshot.child("title").getValue());
+                mConvos.add(dataSnapshot.child("title").getValue().toString());
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+//        loadConvos();
+        mAdapter = new TitleAdapter(this, mConvos);
+        mConvosListView.setAdapter(mAdapter);
+        //TODO: need user object that contains convos they are a part of
     }
 
     @Override
@@ -57,4 +110,11 @@ public class HomeActivity extends AppCompatActivity {
     public void signOut(){
         mAuth.signOut();
     }
+
+    @OnClick(R.id.btn_new_convo)
+    public void newConvo(){
+        Intent createConvoIntent = new Intent(this, CreateConvoActivity.class);
+        startActivity(createConvoIntent);
+    }
+
 }
