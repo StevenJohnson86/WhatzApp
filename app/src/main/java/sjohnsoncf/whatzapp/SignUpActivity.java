@@ -29,14 +29,12 @@ public class SignUpActivity extends AppCompatActivity {
     EditText mSignupEmail;
     @BindView(R.id.signup_password)
     EditText mSignupPassword;
-    private Intent mHomeIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         ButterKnife.bind(this);
-        mHomeIntent = new Intent(this, HomeActivity.class);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -45,8 +43,7 @@ public class SignUpActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
                     //user is signed in
-                    Log.d(TAG, "onAuthStateChanged: user not null??" + user);
-                    startActivity(mHomeIntent);
+                    finish();
                 }
             }
         };
@@ -68,24 +65,22 @@ public class SignUpActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_signup)
     public void userSignup(){
+        String email = mSignupEmail.getText().toString();
         String pw = mSignupPassword.getText().toString();
-        if(pw.length() < 8) {
-            Toast.makeText(this, "Password must be at least 8 characters in length.", Toast.LENGTH_LONG).show();
+        if(email.length() < 4 || pw.length() <= 8) {
+            Toast.makeText(this, "Ensure you have a valid email and your password is 8 or more characters.", Toast.LENGTH_LONG).show();
             return;
         }
-        createAccount(mSignupEmail.getText().toString(), pw);
+        createAccount(email, pw);
     }
 
     private void createAccount(String email, String password){
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>(){
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                //task is successful?
                 if(task.isSuccessful()) {
-//                    Toast.makeText(SignUpActivity.this, "auth success", Toast.LENGTH_LONG).show();
-                    startActivity(mHomeIntent);
+                    finish();
                 } else {
-                    //task failed (auth failed)
                     Toast.makeText(SignUpActivity.this, "auth failure", Toast.LENGTH_LONG).show();
                 }
             }
@@ -94,7 +89,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_signup_to_login)
     public void gotoLogin(){
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivity(loginIntent);
+        finish();
     }
 }

@@ -29,14 +29,12 @@ public class LoginActivity extends AppCompatActivity {
     EditText mLoginEmail;
     @BindView(R.id.editText_login_password)
     EditText mLoginPassword;
-    private Intent mHomeIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        mHomeIntent = new Intent(this, HomeActivity.class);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -45,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
                     //user is signed in
-                    startActivity(mHomeIntent);
+                    finish();
 
                 }
             }
@@ -66,7 +64,13 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_login)
     public void userLogin(){
-        signIn(mLoginEmail.getText().toString(), mLoginPassword.getText().toString());
+        String email = mLoginEmail.getText().toString();
+        String pw = mLoginPassword.getText().toString();
+        if(email.length() < 4 || pw.length() < 8){
+            Toast.makeText(this, "Login Failed: Ensure your email is correct and password is 8 or more characters.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        signIn(email, pw);
     }
 
     private void signIn(String email, String password){
@@ -75,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            startActivity(mHomeIntent);
+                            finish();
                         } else {
                             Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_LONG).show();
                         }
@@ -85,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_login_to_signup)
     public void gotoSignup(){
-        Log.d(TAG, "gotoSignup: clicked");
         Intent signUpIntent = new Intent(this, SignUpActivity.class);
         startActivity(signUpIntent);
     }
