@@ -20,21 +20,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SignUpActivity extends AppCompatActivity {
-    private static final String TAG = "SignUpActivity";
+public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    @BindView(R.id.signup_email)
-    EditText mSignupEmail;
-    @BindView(R.id.signup_password)
-    EditText mSignupPassword;
+    @BindView(R.id.editText_login_email)
+    EditText mLoginEmail;
+    @BindView(R.id.editText_login_password)
+    EditText mLoginPassword;
     private Intent mHomeIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         mHomeIntent = new Intent(this, HomeActivity.class);
 
@@ -45,13 +45,11 @@ public class SignUpActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null){
                     //user is signed in
-                    Log.d(TAG, "onAuthStateChanged: user not null??" + user);
                     startActivity(mHomeIntent);
+
                 }
             }
         };
-
-
     }
 
     @Override
@@ -66,35 +64,29 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth.removeAuthStateListener(mAuthListener);
     }
 
-    @OnClick(R.id.btn_signup)
-    public void userSignup(){
-        String pw = mSignupPassword.getText().toString();
-        if(pw.length() < 8) {
-            Toast.makeText(this, "Password must be at least 8 characters in length.", Toast.LENGTH_LONG).show();
-            return;
-        }
-        createAccount(mSignupEmail.getText().toString(), pw);
+    @OnClick(R.id.btn_login)
+    public void userLogin(){
+        signIn(mLoginEmail.getText().toString(), mLoginPassword.getText().toString());
     }
 
-    private void createAccount(String email, String password){
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>(){
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                //task is successful?
-                if(task.isSuccessful()) {
-//                    Toast.makeText(SignUpActivity.this, "auth success", Toast.LENGTH_LONG).show();
-                    startActivity(mHomeIntent);
-                } else {
-                    //task failed (auth failed)
-                    Toast.makeText(SignUpActivity.this, "auth failure", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+    private void signIn(String email, String password){
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            startActivity(mHomeIntent);
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
     }
 
-    @OnClick(R.id.btn_signup_to_login)
-    public void gotoLogin(){
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivity(loginIntent);
+    @OnClick(R.id.btn_login_to_signup)
+    public void gotoSignup(){
+        Log.d(TAG, "gotoSignup: clicked");
+        Intent signUpIntent = new Intent(this, SignUpActivity.class);
+        startActivity(signUpIntent);
     }
 }
