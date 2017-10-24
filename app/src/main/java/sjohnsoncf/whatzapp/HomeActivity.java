@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
+import Model.Convo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @BindView(R.id.listView_convos)
     ListView mConvosListView;
-    public ArrayList<String> mConvos;
+    public ArrayList<Convo> mConvos;
     private TitleAdapter mAdapter;
 
     @Override
@@ -49,7 +50,6 @@ public class HomeActivity extends AppCompatActivity {
                 if(user != null){
                     //user is signed in
 
-
                 } else {
                     //user is signed out
                     Intent loginIntent = new Intent(ctx, LoginActivity.class);
@@ -63,8 +63,8 @@ public class HomeActivity extends AppCompatActivity {
         mDbRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG, "onChildAdded: snapshot :" + dataSnapshot.child("title").getValue());
-                mConvos.add(dataSnapshot.child("title").getValue().toString());
+//                Log.d(TAG, "onChildAdded: snapshot, \nhash : " + dataSnapshot.getKey() + "\ntitle : " + dataSnapshot.child("title").getValue().toString());
+                mConvos.add(new Convo(dataSnapshot.getKey(), dataSnapshot.child("title").getValue().toString()));
                 mAdapter.notifyDataSetChanged();
             }
 
